@@ -225,8 +225,7 @@ module.exports = class XHRUpload extends Plugin {
 
     this.uppy.log(`uploading ${current} of ${total}`)
     return new Promise((resolve, reject) => {
-      this.uppy.emit('upload-started', file)
-
+      
       const data = opts.formData
         ? this.createFormDataUpload(file, opts)
         : this.createBareUpload(file, opts)
@@ -325,16 +324,18 @@ module.exports = class XHRUpload extends Plugin {
         xhr.responseType = opts.responseType
       }
 
-      const headerFile = {
-        ...opts.headers,
-        ...opts.headersFile[file.id]
-      }
-      
-      Object.keys(headerFile).forEach((header) => {
-        xhr.setRequestHeader(header, headerFile[header])
-      })
-
       const queuedRequest = this.requests.run(() => {
+        this.uppy.emit('upload-started', file)
+        
+        const headerFile = {
+          ...opts.headers,
+          ...opts.headersFile[file.id]
+        }
+      
+        Object.keys(headerFile).forEach((header) => {
+          xhr.setRequestHeader(header, headerFile[header])
+        })
+        
         xhr.send(data)
         return () => {
           timer.done()
