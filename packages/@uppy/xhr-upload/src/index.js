@@ -67,6 +67,7 @@ module.exports = class XHRUpload extends Plugin {
       responseUrlFieldName: 'url',
       bundle: false,
       headers: {},
+      headersFile: {},
       timeout: 30 * 1000,
       limit: 0,
       withCredentials: false,
@@ -324,8 +325,13 @@ module.exports = class XHRUpload extends Plugin {
         xhr.responseType = opts.responseType
       }
 
-      Object.keys(opts.headers).forEach((header) => {
-        xhr.setRequestHeader(header, opts.headers[header])
+      const headerFile = {
+        ...opts.headers,
+        ...opts.headersFile[file.id]
+      }
+      
+      Object.keys(headerFile).forEach((header) => {
+        xhr.setRequestHeader(header, headerFile[header])
       })
 
       const queuedRequest = this.requests.run(() => {
